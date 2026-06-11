@@ -1,0 +1,11 @@
+[package]
+name = "elf-symbols"
+version = "0.1.0"
+authors = ["Martin Kröning <mkroening@posteo.net>"]
+edition = "2024"
+rust-version = "1.85"
+description = "Linker-defined ELF symbols."
+repository = "https://github.com/mkroening/elf-symbols"
+license = "MIT OR Apache-2.0"
+keywords = ["linker", "ELF", "symbol", "segment", "header"]
+categories = ["embedded", "no-std::no-alloc"]

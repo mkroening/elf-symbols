@@ -1,0 +1,174 @@
+name: CI
+
+on:
+  merge_group:
+  pull_request:
+  push:
+
+permissions: {}
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  RUSTFLAGS: -Dwarnings
+  RUSTDOCFLAGS: -Dwarnings
+
+jobs:
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-26.04
+    steps:
+      - &checkout
+        name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - run: cargo clippy
+
+  doc:
+    name: Document
+    runs-on: ubuntu-26.04
+    steps:
+      - *checkout
+      - run: cargo doc
+
+  fmt:
+    name: Format
+    runs-on: ubuntu-26.04
+    steps:
+      - *checkout
+      - run: cargo fmt -- --check
+
+  msrv:
+    name: MSRV
+    runs-on: ubuntu-26.04
+    steps:
+      - *checkout
+      - name: Install Rust toolchain
+        run: rustup override set 1.85
+      - run: cargo check
+
+  test:
+    name: Test
+    runs-on: ubuntu-26.04
+    steps:
+      - *checkout
+      - name: Prepare $HOME/.local/bin
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+      - name: Install LLD, gold
+        run: |
+          sudo apt-get update
+          sudo apt-get install lld binutils-gold
+      - name: Install Wild
+        run: |
+          gh release download --repo wild-linker/wild 0.9.0 --pattern "wild-linker-*-x86_64-unknown-linux-gnu.tar.gz"
+          tar -xvf wild-linker-*-x86_64-unknown-linux-gnu.tar.gz
+          mv wild-linker-*-x86_64-unknown-linux-gnu/wild "$HOME/.local/bin"
+          rm -r wild-linker-*-x86_64-unknown-linux-gnu
+          ln -s wild "$HOME/.local/bin/ld.wild"
+          wild --version
+      - name: Install mold
+        run: |
+          gh release download --repo rui314/mold v2.37.1 --pattern "mold-*-x86_64-linux.tar.gz"
+          tar -xvf mold-*-x86_64-linux.tar.gz
+          mv mold-*-x86_64-linux/bin/mold "$HOME/.local/bin"
+          rm -r mold-*-x86_64-linux
+          ln -s mold "$HOME/.local/bin/ld.mold"
+          mold --version
+
+      - name: Test (default)
+        run: cargo test
+      - name: Run example (default)
+        run: cargo run --example print
+
+      - name: Test (GCC, BFD)
+        run: cargo test
+        env:
+          RUSTFLAGS: -Clinker=gcc -Clink-arg=-fuse-ld=bfd
+      - name: Run example (GCC, BFD)
+        run: cargo run --example print
+        env:
+          RUSTFLAGS: -Clinker=gcc -Clink-arg=-fuse-ld=bfd
+
+      - name: Test (GCC, gold)
+        run: cargo test
+        env:
+          RUSTFLAGS: -Clinker=gcc -Clink-arg=-fuse-ld=gold
+      - name: Run example (GCC, gold)
+        run: cargo run --example print
+        env:
+          RUSTFLAGS: -Clinker=gcc -Clink-arg=-fuse-ld=gold
+
+      - name: Test (GCC, LLD)
+        run: cargo test
+        env:
+          RUSTFLAGS: -Clinker=gcc -Clink-arg=-fuse-ld=lld
+      - name: Run example (GCC, LLD)
+        run: cargo run --example print
+        env:
+          RUSTFLAGS: -Clinker=gcc -Clink-arg=-fuse-ld=lld
+
+      - name: Test (GCC, mold)
+        run: cargo test
+        env:
+          RUSTFLAGS: -Clinker=gcc -Clink-arg=-fuse-ld=mold
+      - name: Run example (GCC, mold)
+        run: cargo run --example print
+        env:
+          RUSTFLAGS: -Clinker=gcc -Clink-arg=-fuse-ld=mold
+
+      # FIXME: Enable once we are on Ubuntu 28.04
+      # - name: Test (GCC, Wild)
+      #   run: cargo test
+      #   env:
+      #     RUSTFLAGS: -Clinker=gcc -Clink-arg=-fuse-ld=wild
+      # - name: Run example (GCC, Wild)
+      #   run: cargo run --example print
+      #   env:
+      #     RUSTFLAGS: -Clinker=gcc -Clink-arg=-fuse-ld=wild
+
+      - name: Test (Clang, BFD)
+        run: cargo test
+        env:
+          RUSTFLAGS: -Clinker=clang -Clink-arg=-fuse-ld=bfd
+      - name: Run example (Clang, BFD)
+        run: cargo run --example print
+        env:
+          RUSTFLAGS: -Clinker=clang -Clink-arg=-fuse-ld=bfd
+
+      - name: Test (Clang, gold)
+        run: cargo test
+        env:
+          RUSTFLAGS: -Clinker=clang -Clink-arg=-fuse-ld=gold
+      - name: Run example (Clang, gold)
+        run: cargo run --example print
+        env:
+          RUSTFLAGS: -Clinker=clang -Clink-arg=-fuse-ld=gold
+
+      - name: Test (Clang, LLD)
+        run: cargo test
+        env:
+          RUSTFLAGS: -Clinker=clang -Clink-arg=-fuse-ld=lld
+      - name: Run example (Clang, LLD)
+        run: cargo run --example print
+        env:
+          RUSTFLAGS: -Clinker=clang -Clink-arg=-fuse-ld=lld
+
+      - name: Test (Clang, mold)
+        run: cargo test
+        env:
+          RUSTFLAGS: -Clinker=clang -Clink-arg=-fuse-ld=mold
+      - name: Run example (Clang, mold)
+        run: cargo run --example print
+        env:
+          RUSTFLAGS: -Clinker=clang -Clink-arg=-fuse-ld=mold
+
+      - name: Test (Clang, Wild)
+        run: cargo test
+        env:
+          RUSTFLAGS: -Clinker=clang -Clink-arg=-fuse-ld=wild
+      - name: Run example (Clang, Wild)
+        run: cargo run --example print
+        env:
+          RUSTFLAGS: -Clinker=clang -Clink-arg=-fuse-ld=wild
