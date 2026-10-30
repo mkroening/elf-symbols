@@ -33,11 +33,12 @@
 //! # Examples
 //!
 //! ```
-//! println!("Executable start: {:p}", elf_symbols::executable_start());
-//! println!("ELF header:       {:p}", elf_symbols::elf_header());
-//! println!("Text segment end: {:p}", elf_symbols::text_end());
-//! println!("Data segment end: {:p}", elf_symbols::data_end());
-//! println!("Executable end:   {:p}", elf_symbols::executable_end());
+//! println!("Executable start:  {:p}", elf_symbols::executable_start());
+//! println!("ELF header:        {:p}", elf_symbols::elf_header());
+//! println!("Text segment end:  {:p}", elf_symbols::text_end());
+//! println!("Data segment end:  {:p}", elf_symbols::data_end());
+//! println!("BSS segment start: {:p}", elf_symbols::bss_start());
+//! println!("Executable end:    {:p}", elf_symbols::executable_end());
 //! ```
 
 #![no_std]
@@ -165,6 +166,35 @@ pub fn data_end() -> *mut () {
     }
 
     (&raw mut _edata).cast::<()>()
+}
+
+/// Start of the BSS segment (`__bss_start`).
+///
+/// The address of `__bss_start` is the location of the BSS segment.
+///
+/// Apart from changelogs, it is not officially documented.
+///
+/// It is defined by:
+///
+/// - BFD: [binutils-gdb@`252b513`]
+/// - gold: [binutils-gdb@`f6ce93d`]
+/// - LLD: [llvm/llvm-project@`e6c5d38`]
+/// - mold: [rui314/mold@`ccc7f83`]
+/// - Wild: TODO
+///
+/// [binutils-gdb@`252b513`]: https://sourceware.org/git/?p=binutils-gdb.git;a=blob;f=ld/scripttempl/elf.sc;h=e1fea97d791a692b267a267a9a70463289eeb998;hb=252b5132c753830d5fd56823373aed85f2a0db63
+/// [binutils-gdb@`f6ce93d`]: https://sourceware.org/git/?p=binutils-gdb.git;a=commitdiff;h=f6ce93d6e999d1a0c450c5e71c5b3468e6217f0a#patch4
+/// [llvm/llvm-project@`e6c5d38`]: https://github.com/llvm/llvm-project/commit/e6c5d3862d123f84bf400078172fd93680e15c5b
+/// [rui314/mold@`ccc7f83`]: https://github.com/rui314/mold/commit/ccc7f83cde954048424fa488464be41f210e60d1
+#[doc(alias = "__bss_start")]
+#[must_use]
+#[inline]
+pub fn bss_start() -> *mut () {
+    unsafe extern "C" {
+        static mut __bss_start: u8;
+    }
+
+    (&raw mut __bss_start).cast::<()>()
 }
 
 /// End of the executable (`_end`).
