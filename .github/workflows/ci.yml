@@ -62,7 +62,7 @@ jobs:
           sudo apt-get install lld binutils-gold
       - name: Install Wild
         run: |
-          gh release download --repo wild-linker/wild 0.9.0 --pattern "wild-linker-*-x86_64-unknown-linux-gnu.tar.gz"
+          gh release download --repo wild-linker/wild 0.11.0 --pattern "wild-linker-*-x86_64-unknown-linux-gnu.tar.gz"
           tar -xvf wild-linker-*-x86_64-unknown-linux-gnu.tar.gz
           mv wild-linker-*-x86_64-unknown-linux-gnu/wild "$HOME/.local/bin"
           rm -r wild-linker-*-x86_64-unknown-linux-gnu
