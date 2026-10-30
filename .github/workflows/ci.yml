@@ -70,7 +70,7 @@ jobs:
           wild --version
       - name: Install mold
         run: |
-          gh release download --repo rui314/mold v2.37.1 --pattern "mold-*-x86_64-linux.tar.gz"
+          gh release download --repo rui314/mold v3.0.0 --pattern "mold-*-x86_64-linux.tar.gz"
           tar -xvf mold-*-x86_64-linux.tar.gz
           mv mold-*-x86_64-linux/bin/mold "$HOME/.local/bin"
           rm -r mold-*-x86_64-linux
