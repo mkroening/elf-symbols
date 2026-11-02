@@ -1,7 +1,6 @@
 [package]
 name = "elf-symbols"
 version = "0.1.0"
-authors = ["Martin Kröning <mkroening@posteo.net>"]
 edition = "2024"
 rust-version = "1.85"
 description = "Linker-defined ELF symbols."
