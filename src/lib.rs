@@ -67,11 +67,11 @@
 #[must_use]
 #[inline]
 pub fn executable_start() -> *mut () {
-    unsafe extern "C" {
-        static mut __executable_start: u8;
+    unsafe extern "Rust" {
+        static mut __executable_start: ();
     }
 
-    (&raw mut __executable_start).cast::<()>()
+    &raw mut __executable_start
 }
 
 /// ELF file header (`__ehdr_start`).
@@ -101,11 +101,11 @@ pub fn executable_start() -> *mut () {
 #[must_use]
 #[inline]
 pub fn elf_header() -> *mut () {
-    unsafe extern "C" {
-        static mut __ehdr_start: u8;
+    unsafe extern "Rust" {
+        static mut __ehdr_start: ();
     }
 
-    (&raw mut __ehdr_start).cast::<()>()
+    &raw mut __ehdr_start
 }
 
 /// End of the text segment (`_etext`).
@@ -131,11 +131,11 @@ pub fn elf_header() -> *mut () {
 #[must_use]
 #[inline]
 pub fn text_end() -> *mut () {
-    unsafe extern "C" {
-        static mut _etext: u8;
+    unsafe extern "Rust" {
+        static mut _etext: ();
     }
 
-    (&raw mut _etext).cast::<()>()
+    &raw mut _etext
 }
 
 /// End of the data segment (`_edata`).
@@ -161,11 +161,11 @@ pub fn text_end() -> *mut () {
 #[must_use]
 #[inline]
 pub fn data_end() -> *mut () {
-    unsafe extern "C" {
-        static mut _edata: u8;
+    unsafe extern "Rust" {
+        static mut _edata: ();
     }
 
-    (&raw mut _edata).cast::<()>()
+    &raw mut _edata
 }
 
 /// Start of the BSS segment (`__bss_start`).
@@ -190,11 +190,11 @@ pub fn data_end() -> *mut () {
 #[must_use]
 #[inline]
 pub fn bss_start() -> *mut () {
-    unsafe extern "C" {
-        static mut __bss_start: u8;
+    unsafe extern "Rust" {
+        static mut __bss_start: ();
     }
 
-    (&raw mut __bss_start).cast::<()>()
+    &raw mut __bss_start
 }
 
 /// End of the executable (`_end`).
@@ -220,9 +220,9 @@ pub fn bss_start() -> *mut () {
 #[must_use]
 #[inline]
 pub fn executable_end() -> *mut () {
-    unsafe extern "C" {
-        static mut _end: u8;
+    unsafe extern "Rust" {
+        static mut _end: ();
     }
 
-    (&raw mut _end).cast::<()>()
+    &raw mut _end
 }
