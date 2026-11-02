@@ -14,6 +14,7 @@
 //! | `__ehdr_start`       | [`elf_header`]       |
 //! | `_etext`             | [`text_end`]         |
 //! | `_edata`             | [`data_end`]         |
+//! | `__bss_start`        | [`bss_start`]        |
 //! | `_end`               | [`executable_end`]   |
 //!
 //! # Linkers
